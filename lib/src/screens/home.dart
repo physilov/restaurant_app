@@ -27,7 +27,7 @@ class _HomeState extends State<Home> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomText(
-                    text: "What would you like to eat?",
+                    text: "What would you like to eat? ",
                     size: 18,
                   ),
                 ),
