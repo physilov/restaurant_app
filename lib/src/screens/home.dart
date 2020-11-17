@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/src/helpers/change_screen_helper.dart';
+import 'package:restaurant_app/src/screens/cart.dart';
 import 'package:restaurant_app/src/widgets/bottom_navigation_widget.dart';
 import 'package:restaurant_app/src/widgets/categories.dart';
 import 'package:restaurant_app/src/widgets/custom_text.dart';
@@ -27,7 +29,7 @@ class _HomeState extends State<Home> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomText(
-                    text: "What would you like to eat? ",
+                    text: "What would you like to eat?..",
                     size: 18,
                   ),
                 ),
@@ -109,7 +111,7 @@ class _HomeState extends State<Home> {
                       child: Container(
                         height: 200,
                           width: 400,
-                          child: Image.asset("images/appetizer.PNG", fit: BoxFit.fill,)),
+                          child: Image.asset("images/momo.png", fit: BoxFit.fill,)),
                   )
                 ),
                 Padding(
@@ -212,18 +214,30 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             BottomNavigationWidget(
+              onTap: (){
+                changeScreen(context, Home());
+              },
               icon: Icons.home,
               name: "Home",
             ),
             BottomNavigationWidget(
+              onTap: (){
+                changeScreen(context, ShoppingCart());
+              },
               icon: Icons.restaurant_menu,
               name: "Menu",
             ),
             BottomNavigationWidget(
+              onTap: (){
+                changeScreen(context, ShoppingCart());
+              },
               icon: Icons.shopping_cart,
               name: "Cart",
             ),
             BottomNavigationWidget(
+              onTap: (){
+                changeScreen(context, ShoppingCart());
+              },
               icon: Icons.account_box,
               name: "Profile",
             ),

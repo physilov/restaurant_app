@@ -4,11 +4,13 @@ import 'package:restaurant_app/src/models/catogery.dart';
 import 'custom_text.dart';
 
 List<Category> categoriesList = [
-  Category(name: "Appetizer", image: "appetizer.PNG"),
+  Category(name: "Appetizer", image: "appetizer.png"),
+  Category(name: "Momos", image: "momo.png"),
   Category(name: "Soup & Salads", image: "soupnsalad.png"),
-  Category(name: "Tandoori Plates", image: "appetizer.PNG"),
-  Category(name: "House Special", image: "appetizer.PNG"),
-  Category(name: "Classic Curries", image: "appetizer.PNG"),
+  Category(name: "Tandoori Plates", image: "tandoori.png"),
+  Category(name: "House Special", image: "house.png"),
+  Category(name: "Classic Curries", image: "classic.png"),
+  Category(name: "Sides", image: "sides.PNG"),
 ];
 
 class Categories extends StatelessWidget {
