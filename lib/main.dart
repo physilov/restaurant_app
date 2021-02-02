@@ -1,19 +1,44 @@
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/src/provider/auth.dart';
 import 'package:restaurant_app/src/screens/home.dart';
+import 'package:restaurant_app/src/screens/login.dart';
+import 'package:restaurant_app/src/widgets/loading.dart';
 
-void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return MaterialApp(
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider.value(value: AuthProvider.initialize())
+  ],
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Restaurant App',
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: Home(),
-    );
+      home: ScreenController(),
+    ),
+  ));
+}
+
+class ScreenController extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final auth = Provider.of<AuthProvider>(context);
+    switch(auth.status){
+      case Status.Uninitialized:
+        return LoginScreen();
+      case Status.Unauthenticated:
+      case Status.Authenticating:
+        return LoginScreen();
+      case Status.Authenticated:
+        return Home();
+      default: return LoginScreen();
+    }
+
   }
 }

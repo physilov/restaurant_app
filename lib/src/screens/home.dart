@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/src/helpers/change_screen_helper.dart';
+import 'package:restaurant_app/src/provider/auth.dart';
 import 'package:restaurant_app/src/screens/cart.dart';
 import 'package:restaurant_app/src/widgets/bottom_navigation_widget.dart';
 import 'package:restaurant_app/src/widgets/categories.dart';
@@ -15,74 +17,92 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
+
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.black),
+        elevation: 0.1,
+        backgroundColor: Colors.purple,
+        title: CustomText(text: "FoodApp",),
+        actions: <Widget>[
+          Stack(
+            children: <Widget>[
+              IconButton(icon: Icon(Icons.notifications_none), onPressed: (){}),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  height: 10,
+                  width: 10,
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(20)
+                  ),
+
+                ),
+              ),
+            ],
+          ),
+
+        ],
+
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                ),
+                accountName: CustomText(text: authProvider.userModel.firstname,), accountEmail: CustomText(text: authProvider.userModel.email,))
+          ],
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: ListView(
           children: <Widget>[
 
-            //navigation bar
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CustomText(
-                    text: "What would you like to eat?..",
-                    size: 18,
+            Container(
+              color: Colors.purple,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey[300],
+                        offset: Offset(1, 1),
+                        blurRadius: 4,
+                      ),
+                    ],
                   ),
-                ),
-                Stack(
-                  children: <Widget>[
-                    IconButton(icon: Icon(Icons.notifications_none), onPressed: (){}),
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: Container(
-                        height: 10,
-                        width: 10,
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(20)
-                        ),
-
+                  child: ListTile(
+                    leading: Icon(Icons.search, color: Colors.purple),
+                    title: TextField(
+                      decoration: InputDecoration(
+                          hintText: "Find your food",
+                          border: InputBorder.none
                       ),
                     ),
-                  ],
+                    trailing: Icon(Icons.filter_list, color: Colors.purple),
+                  ),
                 ),
-              ],
-            ),//first navigation row
+              ),
+            ),
+
+            //navigation bar
+
+
 
             SizedBox(height: 5.0,),
 
             // search box after navigation bar
 
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey[300],
-                      offset: Offset(1, 1),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  leading: Icon(Icons.search, color: Colors.red),
-                  title: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Find food and restaurants",
-                      border: InputBorder.none
-                    ),
-                  ),
-                  trailing: Icon(Icons.filter_list, color: Colors.red),
-                ),
-              ),
-            ),
+
 
             SizedBox(height: 5.0,),
 
