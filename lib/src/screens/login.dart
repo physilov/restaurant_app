@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/src/helpers/change_screen_helper.dart';
 import 'package:restaurant_app/src/provider/auth.dart';
+import 'package:restaurant_app/src/provider/category.dart';
+import 'package:restaurant_app/src/provider/product.dart';
+import 'package:restaurant_app/src/provider/app.dart';
+
+
 import 'package:restaurant_app/src/screens/register.dart';
 import 'package:restaurant_app/src/screens/register.dart';
 import 'package:restaurant_app/src/widgets/custom_text.dart';
@@ -20,6 +25,13 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final productProvider = Provider.of<ProductProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
+
+
+
+
     return Scaffold(
       key: _key,
       backgroundColor: Colors.white,
@@ -95,6 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                         return;
                       }
+                      Loading();
+                      categoryProvider.loadCategories();
+                      productProvider.loadProducts();
                       authProvider.clearController();
                       changeScreenReplacement(context, Home());
                     },

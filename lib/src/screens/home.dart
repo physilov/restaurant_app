@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/src/helpers/change_screen_helper.dart';
+import 'package:restaurant_app/src/provider/app.dart';
 import 'package:restaurant_app/src/provider/auth.dart';
+
+import 'package:restaurant_app/src/provider/category.dart';
+import 'package:restaurant_app/src/provider/product.dart';
 import 'package:restaurant_app/src/screens/cart.dart';
+import 'package:restaurant_app/src/screens/login.dart';
+import 'package:restaurant_app/src/screens/order.dart';
+import 'package:restaurant_app/src/screens/product_search.dart';
 import 'package:restaurant_app/src/widgets/bottom_navigation_widget.dart';
 import 'package:restaurant_app/src/widgets/categories.dart';
+
 import 'package:restaurant_app/src/widgets/custom_text.dart';
-import 'package:restaurant_app/src/widgets/featured_products.dart';
-import 'package:restaurant_app/src/widgets/small_floating_button.dart';
+import 'package:restaurant_app/src/widgets/featured.dart';
+import 'package:restaurant_app/src/widgets/loading.dart';
+
+import 'category.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -18,6 +28,10 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final productProvider = Provider.of<ProductProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
+
 
     return Scaffold(
 
@@ -29,7 +43,9 @@ class _HomeState extends State<Home> {
         actions: <Widget>[
           Stack(
             children: <Widget>[
-              IconButton(icon: Icon(Icons.notifications_none), onPressed: (){}),
+              IconButton(icon: Icon(Icons.shopping_cart), onPressed: (){
+                changeScreen(context, ShoppingCart());
+              }),
               Positioned(
                 top: 12,
                 right: 12,
@@ -56,12 +72,54 @@ class _HomeState extends State<Home> {
                 decoration: BoxDecoration(
                   color: Colors.purple,
                 ),
-                accountName: CustomText(text: authProvider.userModel.firstname,), accountEmail: CustomText(text: authProvider.userModel.email,))
+                accountName: CustomText(
+                    text: authProvider.userModel?.name ?? "name loading....."),
+                accountEmail: CustomText(text: authProvider.userModel?.email ?? "email loading....")),
+
+            ListTile(
+              onTap: (){
+                changeScreen(context, Home());
+              },
+              leading: Icon(Icons.home),
+              title: CustomText(text: "Home",),
+            ),
+
+            ListTile(
+              onTap: () async{
+                await authProvider.getOrders();
+                changeScreen(context, OrderScreen());
+              },
+              leading: Icon(Icons.bookmark_border),
+              title: CustomText(text: "My orders",),
+            ),
+            ListTile(
+              onTap: () async{
+                changeScreen(context, ShoppingCart());
+              },
+              leading: Icon(Icons.shopping_cart),
+              title: CustomText(text: "Cart",),
+            ),
+            ListTile(
+              onTap: ()  {
+                authProvider.signOut();
+              //  authProvider.clearController();
+                changeScreenReplacement(context, LoginScreen());
+               // Navigator.pop(context);
+              },
+              leading: Icon(Icons.exit_to_app),
+              title: CustomText(text: "Log Out",),
+            )
           ],
         ),
       ),
       backgroundColor: Colors.white,
-      body: SafeArea(
+      body: appProvider.isLoading ? Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[Loading()],
+        ),
+      )
+          :SafeArea(
         child: ListView(
           children: <Widget>[
 
@@ -83,6 +141,14 @@ class _HomeState extends State<Home> {
                   child: ListTile(
                     leading: Icon(Icons.search, color: Colors.purple),
                     title: TextField(
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (pattern)async{
+                        appProvider.changeLoading();
+                        await productProvider.search(productName: pattern);
+                        changeScreen(context, ProductSearchScreen());
+                        appProvider.changeLoading();
+
+                      },
                       decoration: InputDecoration(
                           hintText: "Find your food",
                           border: InputBorder.none
@@ -106,23 +172,51 @@ class _HomeState extends State<Home> {
 
             SizedBox(height: 5.0,),
 
-            Categories(),
+            //Categories(),
+            Container(
+              height: 100,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categoryProvider.categories.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () async {
+         //                     appProvider.changeLoading();
+                        await productProvider.loadProductsByCategory(
+                            categoryName: categoryProvider.categories[index].name);
 
-          //  SizedBox(height: 5.0,),
+                        changeScreen(
+                            context,
+                            CategoryScreen(
+                              categoryModel:
+                              categoryProvider.categories[index],
+                            ));
+
+   //                           appProvider.changeLoading();
+
+                      },
+                      child: Categories(
+                        category: categoryProvider.categories[index],
+                      ),
+                    );
+                  }),
+            ),
+
+            SizedBox(height: 5.0,),
 
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: CustomText(text: "Featured", size: 20, colors: Colors.grey,),
             ),
 
-            Featured(),
+            FeaturedWidget(),
 
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: CustomText(text: "Popular", size: 20, colors: Colors.grey,),
             ),
 
-            Stack(
+      /*      Stack(
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -216,7 +310,7 @@ class _HomeState extends State<Home> {
                 ))
 
               ],
-            ),
+            ), */
 
 
 

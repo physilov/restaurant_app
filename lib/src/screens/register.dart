@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/src/helpers/change_screen_helper.dart';
 import 'package:restaurant_app/src/provider/auth.dart';
+import 'package:restaurant_app/src/provider/category.dart';
+import 'package:restaurant_app/src/provider/product.dart';
 import 'package:restaurant_app/src/screens/login.dart';
 import 'package:restaurant_app/src/widgets/custom_text.dart';
 import 'package:restaurant_app/src/widgets/loading.dart';
@@ -20,6 +22,10 @@ class _RegistrationState extends State<Registration> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final productProvider = Provider.of<ProductProvider>(context);
+
+
     return Scaffold(
       key: _key,
       body: authProvider.status == Status.Authenticating
@@ -36,7 +42,7 @@ class _RegistrationState extends State<Registration> {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
                         child: Text(
-                          "First Name",
+                          "Name",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18.0,
@@ -46,35 +52,14 @@ class _RegistrationState extends State<Registration> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
-                      controller: authProvider.firstname,
+                      controller: authProvider.name,
                       decoration: InputDecoration(
-                        hintText: "firstname",
+                        hintText: "name",
                         hintStyle: TextStyle(color: Colors.grey),
                       ),
                     ),
                   ),
-                  Container(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-                        child: Text(
-                          "Last Name",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18.0,
-                          ),
-                        ),
-                      )),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: authProvider.lastname,
-                      decoration: InputDecoration(
-                        hintText: "lastname",
-                        hintStyle: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  ),
+
                   Container(
                       alignment: Alignment.topLeft,
                       child: Padding(
@@ -159,6 +144,8 @@ class _RegistrationState extends State<Registration> {
                                 SnackBar(content: Text("SignUp FAILED!")));
                             return;
                           }
+                          categoryProvider.loadCategories();
+                          productProvider.loadProducts();
                           authProvider.clearController();
                           changeScreenReplacement(context, Home());
                         },

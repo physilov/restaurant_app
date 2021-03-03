@@ -1,25 +1,38 @@
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/src/helpers/change_screen_helper.dart';
 import 'package:restaurant_app/src/models/products.dart';
+import 'package:restaurant_app/src/provider/app.dart';
+import 'package:restaurant_app/src/provider/auth.dart';
+import 'package:restaurant_app/src/provider/product.dart';
+import 'package:restaurant_app/src/screens/cart.dart';
 import 'package:restaurant_app/src/widgets/custom_text.dart';
+import 'package:restaurant_app/src/widgets/loading.dart';
 import 'package:restaurant_app/src/widgets/small_floating_button.dart';
 
 class Details extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
-  Details({@required this.product});
+  const Details({@required this.product});
   @override
   _DetailsState createState() => _DetailsState();
 }
 
 class _DetailsState extends State<Details> {
+  int quantity = 1;
+  final _key = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
+
     return Scaffold(
+      key: _key,
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
+        child: appProvider.isLoading ? Loading() : Column(
           children: <Widget>[
             Container(
               height: 300,
@@ -28,9 +41,9 @@ class _DetailsState extends State<Details> {
 
                   Carousel(
                     images: [
-                      AssetImage('images/${widget.product.image}'),
-                      AssetImage('images/${widget.product.image}'),
-                      AssetImage('images/${widget.product.image}'),
+                      NetworkImage(widget.product.image),
+                      NetworkImage(widget.product.image),
+
                     ],
                     dotBgColor: Colors.white,
                     dotColor: Colors.grey,
@@ -42,7 +55,7 @@ class _DetailsState extends State<Details> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.arrow_back, color: Colors.white,),
+                        icon: Icon(Icons.arrow_back, color: Colors.black,),
                         onPressed: (){Navigator.pop(context);},
                       ),
                       Stack(
@@ -50,7 +63,10 @@ class _DetailsState extends State<Details> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: IconButton(
-                              icon: Icon(Icons.shopping_cart, color: Colors.white, size: 30,),
+                              icon: Icon(Icons.shopping_cart, color: Colors.red, size: 30,),
+                              onPressed: (){
+                                changeScreen(context, ShoppingCart());
+                              },
                             ),
                           ),
                           Positioned(
@@ -103,7 +119,14 @@ class _DetailsState extends State<Details> {
             ),
 
             CustomText(text: widget.product.name, size: 24, weight: FontWeight.bold,),
-            CustomText(text: "\$" + widget.product.price.toString(), size: 18, weight: FontWeight.w400,),
+            CustomText(text: "\$${widget.product.price / 100}", size: 18, weight: FontWeight.w400,),
+            CustomText(text: "Description", size: 18, weight: FontWeight.w400,),
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(widget.product.description, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w300),),
+
+
+            ),
 
             SizedBox(height: 15,),
             Row(
@@ -111,23 +134,50 @@ class _DetailsState extends State<Details> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: IconButton(icon: Icon(Icons.remove, color: Colors.red, size: 32,), onPressed: (){},),
+                  child: IconButton(icon: Icon(Icons.remove, color: Colors.red, size: 32,), onPressed: (){
+                    if(quantity != 1){
+                      setState(() {
+                        quantity -= 1;
+                      });
+                    }
+                  },),
                 ),
                 GestureDetector(
-                  onTap: (){},
+                  onTap: ()async{
+                    appProvider.changeLoading();
+                    print("loading........");
+
+                    bool value = await authProvider.addToCard(product: widget.product, quantity: quantity);
+                    if(value){
+                      print("Item added to cart");
+                      _key.currentState.showSnackBar(
+                        SnackBar(content: Text("Added to Cart!"))
+                      );
+                      authProvider.reloadUserModel();
+                      appProvider.changeLoading();
+                      return;
+                    }else{
+                      print("Item not added to cart");
+                    }
+                    print("Loading set to false");
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.red,
                     ),
-                    child: Padding(
+                    child: appProvider.isLoading ? Loading() : Padding(
                       padding: const EdgeInsets.fromLTRB(28, 12, 28, 12),
-                      child: CustomText(text: "Add to Bag", colors: Colors.white, size: 24, weight: FontWeight.w600,),
+                      child: CustomText(text: "Add $quantity to Bag", colors: Colors.white, size: 24, weight: FontWeight.w600,),
                     ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: IconButton(icon: Icon(Icons.add, color: Colors.red, size: 32,), onPressed: (){},),
+                  child: IconButton(icon: Icon(Icons.add, color: Colors.red, size: 32,), onPressed: (){
+                    setState(() {
+                      quantity += 1;
+                    });
+                  },),
                 ),
               ],
             )

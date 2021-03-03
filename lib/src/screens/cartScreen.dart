@@ -10,12 +10,12 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/src/widgets/loading.dart';
 import 'package:uuid/uuid.dart';
 
-class ShoppingCart extends StatefulWidget {
+class CartScreen extends StatefulWidget {
   @override
-  _ShoppingCartState createState() => _ShoppingCartState();
+  _CartScreenState createState() => _CartScreenState();
 }
 
-class _ShoppingCartState extends State<ShoppingCart> {
+class _CartScreenState extends State<CartScreen> {
   final _key = GlobalKey<ScaffoldState>();
   OrderServices _orderServices = OrderServices();
 
@@ -47,7 +47,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
         itemCount: authProvider.userModel.cart.length,
         itemBuilder: (_, index){
           return Padding(padding: const EdgeInsets.all(16),
-            child:
+              child:
               Container(
                 height: 120,
                 decoration: BoxDecoration(
@@ -78,7 +78,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                         children: <Widget>[
                           RichText(text: TextSpan(children: [
                             TextSpan(text: authProvider.userModel.cart[index].name + "\n", style: TextStyle(color: Colors.black, fontSize: 20)),
-                            TextSpan(text:  "\$${authProvider.userModel.cart[index].price / 100}  \n", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
+                            TextSpan(text:  "\$${authProvider.userModel.cart[index].price}  \n", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
                             TextSpan(text: "Quantity: ", style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w400)),
                             TextSpan(text: authProvider.userModel.cart[index].quantity.toString(), style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w400)),
 
@@ -86,21 +86,21 @@ class _ShoppingCartState extends State<ShoppingCart> {
                           ),),
 
                           IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red,),
-                            onPressed: ()async{
-                              appProvider.changeLoading();
-                              bool value = await authProvider.removeFromCart(cartItem: authProvider.userModel.cart[index]);
-                              if(value){
-                                authProvider.reloadUserModel();
-                                print("Item added to cart");
-                                _key.currentState.showSnackBar(SnackBar(content: Text("Removed from Cart!")));
+                              icon: Icon(Icons.delete, color: Colors.red,),
+                              onPressed: ()async{
                                 appProvider.changeLoading();
-                                return;
-                              }else{
-                                print("Item was not removed");
-                                appProvider.changeLoading();
+                                bool value = await authProvider.removeFromCart(cartItem: authProvider.userModel.cart[index]);
+                                if(value){
+                                  authProvider.reloadUserModel();
+                                  print("Item added to cart");
+                                  _key.currentState.showSnackBar(SnackBar(content: Text("Removed from Cart!")));
+                                  appProvider.changeLoading();
+                                  return;
+                                }else{
+                                  print("Item was not removed");
+                                  appProvider.changeLoading();
+                                }
                               }
-                            }
                           )
                         ],
                       ),
@@ -122,52 +122,52 @@ class _ShoppingCartState extends State<ShoppingCart> {
             children: [
               RichText(text: TextSpan(children: [
                 TextSpan(
-                  text: "Total: ",
-                  style: TextStyle(color: Colors.grey, fontSize: 22, fontWeight: FontWeight.w400)
+                    text: "Total: ",
+                    style: TextStyle(color: Colors.grey, fontSize: 22, fontWeight: FontWeight.w400)
                 ),
                 TextSpan(
-                  text: "\$${authProvider.userModel.totalCartPrice / 100}",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 22,
-                    fontWeight: FontWeight.normal
-                  )
+                    text: "\$${authProvider.userModel.totalCartPrice}",
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 22,
+                        fontWeight: FontWeight.normal
+                    )
                 ),
               ])),
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20), color: Colors.grey
+                    borderRadius: BorderRadius.circular(20), color: Colors.grey
                 ),
                 child: FlatButton(
                   onPressed: (){
                     if(authProvider.userModel.totalCartPrice == 0){
                       showDialog(
-                        context: context,
-                        builder: (BuildContext context){
-                          return Dialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)
-                            ),
-                            child: Container(
-                              height: 200,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text('Your cart is empty', textAlign: TextAlign.center,),
-                                      ],
-                                    )
-                                  ],
+                          context: context,
+                          builder: (BuildContext context){
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)
+                              ),
+                              child: Container(
+                                height: 200,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text('Your cart is empty', textAlign: TextAlign.center,),
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }
+                            );
+                          }
                       );
                       return;
                     }
@@ -176,7 +176,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                         builder: (BuildContext context){
                           return Dialog(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)
+                                borderRadius: BorderRadius.circular(20)
                             ),
                             child: Container(
                               height: 200,
@@ -186,7 +186,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('You will be charged \$${authProvider.userModel.totalCartPrice / 100}', textAlign: TextAlign.center,),
+                                    Text('You will be charged \$${authProvider.userModel.totalCartPrice}', textAlign: TextAlign.center,),
                                     SizedBox(
                                       width: 320.0,
                                       child: RaisedButton(
@@ -194,12 +194,12 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                           var uuid = Uuid();
                                           String id = uuid.v4();
                                           _orderServices.createOrder(
-                                            userId: authProvider.user.uid,
-                                            id: id,
-                                            description: "Some random description",
-                                            status: "complete",
-                                            totalPrice: authProvider.userModel.totalCartPrice,
-                                            cart: authProvider.userModel.cart
+                                              userId: authProvider.user.uid,
+                                              id: id,
+                                              description: "Some random description",
+                                              status: "complete",
+                                              totalPrice: authProvider.userModel.totalCartPrice,
+                                              cart: authProvider.userModel.cart
                                           );
                                           for(CartItemModel cartItem in authProvider.userModel.cart){
                                             bool value = await authProvider.removeFromCart(cartItem: cartItem);
@@ -207,14 +207,14 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                               authProvider.reloadUserModel();
                                               print("Item addded to cart");
                                               _key.currentState.showSnackBar(
-                                                SnackBar(content: Text("Removed from Cart!"))
+                                                  SnackBar(content: Text("Removed from Cart!"))
                                               );
                                             }else{
                                               print("ITEM WAS NOT REMOVED");
                                             }
                                           }
                                           _key.currentState.showSnackBar(
-                                            SnackBar(content: Text("Order created!"))
+                                              SnackBar(content: Text("Order created!"))
                                           );
                                           Navigator.pop(context);
 
