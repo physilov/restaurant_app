@@ -72,9 +72,11 @@ class _HomeState extends State<Home> {
                 decoration: BoxDecoration(
                   color: Colors.purple,
                 ),
-                accountName: CustomText(
-                    text: authProvider.userModel?.name ?? "name loading....."),
-                accountEmail: CustomText(text: authProvider.userModel?.email ?? "email loading....")),
+                //currentAccountPicture: Image.network(authProvider.user.photoURL),
+                accountName: Text(
+                  '${authProvider.user.displayName}'
+                ),
+                accountEmail: CustomText(text: authProvider.user.email)),
 
             ListTile(
               onTap: (){
@@ -113,13 +115,7 @@ class _HomeState extends State<Home> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: appProvider.isLoading ? Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[Loading()],
-        ),
-      )
-          :SafeArea(
+      body: SafeArea(
         child: ListView(
           children: <Widget>[
 

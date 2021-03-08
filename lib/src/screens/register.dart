@@ -139,8 +139,11 @@ class _RegistrationState extends State<Registration> {
                       ),
                       child: GestureDetector(
                         onTap: () async {
-                          if (!await authProvider.signUp()) {
-                            _key.currentState.showSnackBar(
+                          Map result = await authProvider.signUp();
+                          bool success = result['success'];
+                          String message = result['message'];
+                          if (!success) {
+                            var showSnackBar = _key.currentState.showSnackBar(
                                 SnackBar(content: Text("SignUp FAILED!")));
                             return;
                           }

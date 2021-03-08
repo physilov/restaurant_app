@@ -6,10 +6,21 @@ class UserServices{
   String collection = "users";
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void createUser(Map<String, dynamic> values){
-    String id = values["id"];
-    _firestore.collection(collection).doc(id).set(values);
+  void createUser({
+    String id,
+    String name,
+    String photo,
+    String email,
+  })  {
+
+    _firestore.collection(collection).doc(id).set({
+      "name" : name,
+      "id" : id,
+      "photo" : photo,
+      "email" : email,
+    });
   }
+
 
   void updateUserData(Map<String, dynamic> values){
     _firestore.collection(collection).doc(values['id']).update(values);
@@ -34,4 +45,11 @@ class UserServices{
   Future<UserModel> getUserById(String id) => _firestore.collection(collection).doc(id).get().then((doc){
     return UserModel.fromSnapshot(doc);
 });
+
+
+  Future<bool> doesUserExist(String id) async => _firestore
+      .collection(collection)
+      .doc(id)
+      .get()
+      .then((value) => value.exists);
 }

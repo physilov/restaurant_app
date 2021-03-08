@@ -1,3 +1,5 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:restaurant_app/src/models/products.dart';
 import 'package:restaurant_app/src/models/user.dart';
 import 'package:restaurant_app/src/models/cart_item.dart';
 import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum Status { Uninitialized, Unauthenticated, Authenticating, Authenticated }
 
@@ -15,7 +18,7 @@ class AuthProvider with ChangeNotifier {
   FirebaseAuth _auth;
   User _user;
   Status _status = Status.Uninitialized;
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //FirebaseFirestore _firestore = FirebaseFirestore.instance;
   UserServices _userServices = UserServices();
   OrderServices _orderServices = OrderServices();
   UserModel _userModel;
@@ -37,45 +40,57 @@ class AuthProvider with ChangeNotifier {
     _auth.authStateChanges().listen(_onStateChanged);
   }
 
-  Future<bool> signIn() async {
+  Future<Map<String, dynamic>> signIn() async {
     try {
       _status = Status.Authenticating;
       notifyListeners();
+      final AuthCredential credential = EmailAuthProvider.credential(email: email.text, password: password.text);
       await _auth.signInWithEmailAndPassword(
           email: email.text.trim(), password: password.text.trim());
-      return true;
+      return {'success': true, 'message': 'success'};
     } catch (e) {
       _status = Status.Unauthenticated;
       notifyListeners();
       print(e.toString());
-      return false;
+      return {'success': true};
     }
   }
 
-  Future<bool> signUp() async {
+
+
+  Future<Map<String, dynamic>> signUp() async {
     try {
       _status = Status.Authenticating;
       notifyListeners();
-      await _auth
+      final AuthCredential credential = EmailAuthProvider.credential(email: email.text, password: password.text);
+
+       await _auth
           .createUserWithEmailAndPassword(
               email: email.text.trim(), password: password.text.trim())
-          .then((user) {
-        Map<String, dynamic> values = {
-          "name": name.text,
-          "email": email.text,
-          "uid": user.user.uid,
-          "phone": phone.text,
-          "likedFood": [],
-        };
-        _userServices.createUser(values);
+          .then((userCredential) async {
+            _user = userCredential.user;
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString("id", _user.uid);
+            if(!await _userServices.doesUserExist(_user.uid)){
+              _userServices.createUser(
+                id: _user.uid,
+                name: _user.displayName,
+                photo: _user.photoURL,
+                email: _user.email);
+              await initializeUserModel();
+            } else {
+              await initializeUserModel();
+        }
+
+
       });
       //_userServices.createUser();
-      return true;
+      return {'success' : true, 'message' : 'success'};
     } catch (e) {
       _status = Status.Unauthenticated;
       notifyListeners();
       print(e.toString());
-      return false;
+      return {'success' : true};
     }
   }
 
@@ -88,13 +103,28 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> _onStateChanged(User firebaseUser) async {
     if (firebaseUser == null) {
-      _status = Status.Unauthenticated;
+      _status = Status.Uninitialized;
     } else {
       _user = firebaseUser;
-      _status = Status.Authenticated;
-      _userModel = await _userServices.getUserById(user.uid);
+      initializeUserModel();
+      Future.delayed(const Duration(seconds: 2), (){
+        _status = Status.Authenticated;
+      });
+
     }
     notifyListeners();
+  }
+
+  Future<bool> initializeUserModel() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String _userId = preferences.getString('id');
+    _userModel = await _userServices.getUserById(_userId);
+    notifyListeners();
+    if(_userModel == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   Future<void> reloadUserModel() async {

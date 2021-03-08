@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       key: _key,
       backgroundColor: Colors.white,
-      body: authProvider.status == Status.Authenticating? Loading() : SingleChildScrollView(
+      body: SingleChildScrollView(
           child:
           Column(
             children: <Widget>[
@@ -101,8 +101,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: GestureDetector(
                     onTap: () async {
-                      if (!await authProvider.signIn()) {
-                        _key.currentState.showSnackBar(
+                      Map result = await authProvider.signIn();
+                      bool success = result['success'];
+
+                      if (!success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text("LOGIN FAILED!"))
                         );
                         return;

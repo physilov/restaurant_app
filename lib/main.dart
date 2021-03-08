@@ -11,6 +11,7 @@ import 'package:restaurant_app/src/screens/login.dart';
 import 'package:restaurant_app/src/screens/cartScreen.dart';
 
 import 'package:restaurant_app/src/screens/splash.dart';
+import 'package:restaurant_app/src/widgets/loading.dart';
 
 
 void main() async {
@@ -40,10 +41,10 @@ class ScreenController extends StatelessWidget {
     final auth = Provider.of<AuthProvider>(context);
     switch(auth.status){
       case Status.Uninitialized:
-        return Splash();
+        return LoginScreen();
       case Status.Unauthenticated:
       case Status.Authenticating:
-        return LoginScreen();
+        return Loading();
       case Status.Authenticated:
         return Home();
       default: return LoginScreen();
