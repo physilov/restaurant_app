@@ -10,6 +10,7 @@ import 'package:restaurant_app/src/screens/cart.dart';
 import 'package:restaurant_app/src/screens/login.dart';
 import 'package:restaurant_app/src/screens/order.dart';
 import 'package:restaurant_app/src/screens/product_search.dart';
+import 'package:restaurant_app/src/screens/profile.dart';
 import 'package:restaurant_app/src/widgets/bottom_navigation_widget.dart';
 import 'package:restaurant_app/src/widgets/categories.dart';
 
@@ -73,10 +74,10 @@ class _HomeState extends State<Home> {
                   color: Colors.purple,
                 ),
                 //currentAccountPicture: Image.network(authProvider.user.photoURL),
-                accountName: Text(
-                  '${authProvider.user.displayName}'
+                accountName: CustomText(
+                  text: '${authProvider.userModel?.name ??'....'}',
                 ),
-                accountEmail: CustomText(text: authProvider.user.email)),
+                accountEmail: CustomText(text: authProvider.user?.email ?? "email loading......")),
 
             ListTile(
               onTap: (){
@@ -84,6 +85,13 @@ class _HomeState extends State<Home> {
               },
               leading: Icon(Icons.home),
               title: CustomText(text: "Home",),
+            ),
+            ListTile(
+              onTap: (){
+                changeScreen(context, Profile());
+              },
+              leading: Icon(Icons.person_pin),
+              title: CustomText(text: "Profile",),
             ),
 
             ListTile(
@@ -115,7 +123,12 @@ class _HomeState extends State<Home> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: SafeArea(
+      body: appProvider.isLoading ? Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Loading()],
+        ),
+      ) : SafeArea(
         child: ListView(
           children: <Widget>[
 

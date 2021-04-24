@@ -16,7 +16,7 @@ class ShoppingCart extends StatefulWidget {
 }
 
 class _ShoppingCartState extends State<ShoppingCart> {
-  final _key = GlobalKey<ScaffoldState>();
+ // final _key = GlobalKey<ScaffoldState>();
   OrderServices _orderServices = OrderServices();
 
   @override
@@ -26,7 +26,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
 
 
     return Scaffold(
-      key: _key,
+     // key: _key,
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.red),
         backgroundColor: Colors.white,
@@ -93,7 +93,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                               if(value){
                                 authProvider.reloadUserModel();
                                 print("Item added to cart");
-                                _key.currentState.showSnackBar(SnackBar(content: Text("Removed from Cart!")));
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Removed from Cart!")));
                                 appProvider.changeLoading();
                                 return;
                               }else{
@@ -138,7 +138,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20), color: Colors.grey
                 ),
-                child: FlatButton(
+                child: TextButton(
                   onPressed: (){
                     if(authProvider.userModel.totalCartPrice == 0){
                       showDialog(
@@ -189,7 +189,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                     Text('You will be charged \$${authProvider.userModel.totalCartPrice / 100}', textAlign: TextAlign.center,),
                                     SizedBox(
                                       width: 320.0,
-                                      child: RaisedButton(
+                                      child: ElevatedButton(
                                         onPressed: ()async{
                                           var uuid = Uuid();
                                           String id = uuid.v4();
@@ -206,14 +206,14 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                             if(value){
                                               authProvider.reloadUserModel();
                                               print("Item addded to cart");
-                                              _key.currentState.showSnackBar(
+                                              ScaffoldMessenger.of(context).showSnackBar(
                                                 SnackBar(content: Text("Removed from Cart!"))
                                               );
                                             }else{
                                               print("ITEM WAS NOT REMOVED");
                                             }
                                           }
-                                          _key.currentState.showSnackBar(
+                                          ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(content: Text("Order created!"))
                                           );
                                           Navigator.pop(context);
@@ -224,12 +224,12 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                           style: TextStyle(color: Colors.white
                                           ),
                                         ),
-                                        color: const Color(0xFF1BC0C5),
+                                        //color: const Color(0xFF1BC0C5),
                                       ),
                                     ),
                                     SizedBox(
                                       width: 320.0,
-                                      child: RaisedButton(
+                                      child: ElevatedButton(
                                         onPressed: (){
                                           Navigator.pop(context);
                                         },
@@ -237,7 +237,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                           "Reject",
                                           style: TextStyle(color: Colors.white),
                                         ),
-                                        color: Colors.red,
+                                        //color: Colors.red,
                                       ),
                                     )
                                   ],

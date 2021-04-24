@@ -20,7 +20,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _key = GlobalKey<ScaffoldState>();
+ // final _key = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
     return Scaffold(
-      key: _key,
+     // key: _key,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
           child:
@@ -101,16 +101,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: GestureDetector(
                     onTap: () async {
-                      Map result = await authProvider.signIn();
-                      bool success = result['success'];
-
-                      if (!success) {
+                      if(!await authProvider.signIn()){
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("LOGIN FAILED!"))
+                            SnackBar(content: Text("Login failed!"))
                         );
                         return;
                       }
-                      Loading();
                       categoryProvider.loadCategories();
                       productProvider.loadProducts();
                       authProvider.clearController();
@@ -124,6 +120,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+              Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.red,
+                  ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      Map result = await authProvider.signInWithGoogle();
+                      bool success = result['success'];
+                      String message = result['message'];
+                      print(message);
+
+                      if(!success) {
+                        appProvider.changeLoading();
+                      } else {
+                        //appProvider.changeLoading();
+                        categoryProvider.loadCategories();
+                        productProvider.loadProducts();
+                        authProvider.clearController();
+                        changeScreen(context, Home());
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CustomText(text: "Login in WIth Google", colors: Colors.white,),
+                    ),
+                  )),
               GestureDetector(
                 onTap: () {
                   changeScreen(context, Registration());

@@ -139,12 +139,11 @@ class _RegistrationState extends State<Registration> {
                       ),
                       child: GestureDetector(
                         onTap: () async {
-                          Map result = await authProvider.signUp();
-                          bool success = result['success'];
-                          String message = result['message'];
-                          if (!success) {
-                            var showSnackBar = _key.currentState.showSnackBar(
-                                SnackBar(content: Text("SignUp FAILED!")));
+                          print("BTN CLICKED!!!!");
+                          if(!await authProvider.signUp()){
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Resgistration failed!"))
+                            );
                             return;
                           }
                           categoryProvider.loadCategories();

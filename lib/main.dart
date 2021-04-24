@@ -18,7 +18,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider.value(value: AuthProvider.initialize()),
+    ChangeNotifierProvider.value(value: AuthProvider.init()),
     ChangeNotifierProvider.value(value: CategoryProvider.initialize()),
     ChangeNotifierProvider.value(value: ProductProvider.initialize()),
     ChangeNotifierProvider.value(value: AppProvider()),
@@ -44,7 +44,7 @@ class ScreenController extends StatelessWidget {
         return LoginScreen();
       case Status.Unauthenticated:
       case Status.Authenticating:
-        return Loading();
+        return Splash();
       case Status.Authenticated:
         return Home();
       default: return LoginScreen();
